@@ -16,7 +16,14 @@ namespace ECSInput
     public class InputProcessSystem
     {
         private Mode mode = Mode.Agent;
+        public float scale = 1.0f;
 
+        private KeyBindingsManager kbm;
+
+        public InputProcessSystem()
+        {
+            kbm = new KeyBindingsManager();
+        }
         private void UpdateMode(AgentEntity agentEntity)
         {
             ref var planet = ref GameState.Planet;
@@ -37,7 +44,7 @@ namespace ECSInput
             }
         }
 
-        public float scale = 1.0f;
+
 
         public void Update()
         {
@@ -51,11 +58,11 @@ namespace ECSInput
             Camera.main.orthographicSize = 20.0f / scale;
 
             int x = 0;
-            if (UnityEngine.Input.GetKey(UnityEngine.KeyCode.D) && mode == Mode.Agent)
+            if (UnityEngine.Input.GetKey(kbm.GetKeyForAction(ActionEnums.PLAYER_RIGHT)) && mode == Mode.Agent)
             {
                 x += 1;
             }
-            if (UnityEngine.Input.GetKey(UnityEngine.KeyCode.A) && mode == Mode.Agent)
+            if (UnityEngine.Input.GetKey(kbm.GetKeyForAction(ActionEnums.PLAYER_LEFT)) && mode == Mode.Agent)
             {
                 x -= 1;
             }
@@ -68,25 +75,25 @@ namespace ECSInput
                 
 
                 // Jump
-                if (UnityEngine.Input.GetKeyDown(UnityEngine.KeyCode.W) && mode == Mode.Agent)
+                if (UnityEngine.Input.GetKeyDown(kbm.GetKeyForAction(ActionEnums.PLAYER_JUMP)) && mode == Mode.Agent)
                 {
                     player.Jump();
                 }
                 // Dash
-                if (UnityEngine.Input.GetKeyDown(UnityEngine.KeyCode.Space) && mode == Mode.Agent)
+                if (UnityEngine.Input.GetKeyDown(kbm.GetKeyForAction(ActionEnums.PLAYER_DASH)) && mode == Mode.Agent)
                 {
                     player.Dash(x);
                 }
 
                 // Attack
-                if (UnityEngine.Input.GetKeyDown(UnityEngine.KeyCode.K) && mode == Mode.Agent)
+                if (UnityEngine.Input.GetKeyDown(kbm.GetKeyForAction(ActionEnums.PLAYER_ROLL)) && mode == Mode.Agent)
                 {
                     player.Roll(x);
                 }
 
 
                 // Running
-                if (UnityEngine.Input.GetKey(UnityEngine.KeyCode.LeftAlt))
+                if (UnityEngine.Input.GetKey(kbm.GetKeyForAction(ActionEnums.PLAYER_RUN)))
                 {
                     if(mode == Mode.Agent)
                     player.Run(x);
@@ -97,7 +104,7 @@ namespace ECSInput
                     player.Walk(x);
                 }
 
-                if (UnityEngine.Input.GetKey(UnityEngine.KeyCode.LeftControl) && mode == Mode.Agent)
+                if (UnityEngine.Input.GetKey(kbm.GetKeyForAction(ActionEnums.PLAYER_CROUCH)) && mode == Mode.Agent)
                 {
                     if(mode == Mode.Agent)
                     player.Crouch(x);
@@ -109,7 +116,7 @@ namespace ECSInput
                 }
 
                 // JetPack
-                if (UnityEngine.Input.GetKey(UnityEngine.KeyCode.F) && player.agentStats.Fuel > 0)
+                if (UnityEngine.Input.GetKey(kbm.GetKeyForAction(ActionEnums.PLAYER_JETPACK)) && player.agentStats.Fuel > 0)
                 {
                     player.JetPackFlying();
                 }
@@ -121,7 +128,7 @@ namespace ECSInput
                     }
                 }
 
-                if (UnityEngine.Input.GetKeyDown(UnityEngine.KeyCode.S))
+                if (UnityEngine.Input.GetKeyDown(kbm.GetKeyForAction(ActionEnums.PLAYER_WALK)))
                 {
                     if(mode == Mode.Agent)
                     player.Walk(x);
@@ -147,19 +154,19 @@ namespace ECSInput
                 }
 
                 // JetPack
-                if (UnityEngine.Input.GetKey(UnityEngine.KeyCode.F))
+                if (UnityEngine.Input.GetKey(kbm.GetKeyForAction(ActionEnums.PLAYER_JETPACK)))
                 {
                     player.JetPackFlying();
                 }
 
-                if (UnityEngine.Input.GetKeyDown(UnityEngine.KeyCode.DownArrow))
+                if (UnityEngine.Input.GetKeyDown(kbm.GetKeyForAction(ActionEnums.PLAYER_DOWN)))
                 {
                     player.agentPhysicsState.Droping = true;
                 }
             }
 
 
-            if (UnityEngine.Input.GetKeyDown(UnityEngine.KeyCode.E))
+            if (UnityEngine.Input.GetKeyDown(kbm.GetKeyForAction(ActionEnums.UNKNOWN_ACTION)))
             {
                 var players = contexts.agent.GetGroup(AgentMatcher.AgentPlayer);
                 var mechEntities = contexts.mech.GetGroup(MechMatcher.MechID);
@@ -342,7 +349,7 @@ namespace ECSInput
             }
 
             // Recharge Weapon.
-            if (UnityEngine.Input.GetKeyDown(UnityEngine.KeyCode.Q))
+            if (UnityEngine.Input.GetKeyDown(kbm.GetKeyForAction(ActionEnums.RECHARGE_WEAPON)))
             {
                 var players = contexts.agent.GetGroup(AgentMatcher.AllOf(AgentMatcher.AgentPlayer));
                 foreach (var player in players) 
@@ -350,7 +357,7 @@ namespace ECSInput
             }
 
             // Drop Action. 
-            if (UnityEngine.Input.GetKeyUp(UnityEngine.KeyCode.T))
+            if (UnityEngine.Input.GetKeyUp(kbm.GetKeyForAction(ActionEnums.DROP_ACTION)))
             {
                 var players = contexts.agent.GetGroup(AgentMatcher.AllOf(AgentMatcher.AgentPlayer));
                 foreach (var player in players)
@@ -358,7 +365,7 @@ namespace ECSInput
             }
 
             // Reload Weapon.
-            if (UnityEngine.Input.GetKeyDown(UnityEngine.KeyCode.R))
+            if (UnityEngine.Input.GetKeyDown(kbm.GetKeyForAction(ActionEnums.RELOAD_WEAPON)))
             {
                 var players = contexts.agent.GetGroup(AgentMatcher.AllOf(AgentMatcher.AgentPlayer));
                 foreach (var player in players)
@@ -366,7 +373,7 @@ namespace ECSInput
             }
 
             // Shield Action.
-            if (UnityEngine.Input.GetKeyDown(UnityEngine.KeyCode.Mouse1))
+            if (UnityEngine.Input.GetKeyDown(kbm.GetKeyForAction(ActionEnums.SHIELD_ACTION)))
             {
                 var players = contexts.agent.GetGroup(AgentMatcher.AllOf(AgentMatcher.AgentPlayer));
                 foreach (var player in players)
@@ -375,7 +382,7 @@ namespace ECSInput
             }
 
             // Show/Hide Statistics
-            if (UnityEngine.Input.GetKeyDown(UnityEngine.KeyCode.F1))
+            if (UnityEngine.Input.GetKeyDown(kbm.GetKeyForAction(ActionEnums.TOGGLE_STAT)))
             {
                 if (StatisticsDisplay.TextWrapper.GetGameObject().GetComponent<Text>().enabled)
                     StatisticsDisplay.TextWrapper.GetGameObject().GetComponent<Text>().enabled = false;
@@ -385,27 +392,27 @@ namespace ECSInput
             }
 
             // Remove Tile Front At Cursor Position.
-            if (UnityEngine.Input.GetKeyDown(UnityEngine.KeyCode.F2))
+            if (UnityEngine.Input.GetKeyDown(kbm.GetKeyForAction(ActionEnums.REMOVE_TILE_FRONT_AT_CURSOR_POSITION)))
             {
                 UnityEngine.Vector3 worldPosition = UnityEngine.Camera.main.ScreenToWorldPoint(UnityEngine.Input.mousePosition);
                 planet.TileMap.RemoveFrontTile((int)worldPosition.x, (int)worldPosition.y);
             }
 
             // Remove Tile Back At Cursor Position.
-            if (UnityEngine.Input.GetKeyDown(UnityEngine.KeyCode.F3))
+            if (UnityEngine.Input.GetKeyDown(kbm.GetKeyForAction(ActionEnums.REMOVE_TILE_BACK_AT_CURSOR_POSITION)))
             {
                 UnityEngine.Vector3 worldPosition = UnityEngine.Camera.main.ScreenToWorldPoint(UnityEngine.Input.mousePosition);
                 planet.TileMap.RemoveBackTile((int)worldPosition.x, (int)worldPosition.y);
             }
 
             // Enable tile collision isotype rendering.
-            if (UnityEngine.Input.GetKeyDown(UnityEngine.KeyCode.F4))
+            if (UnityEngine.Input.GetKeyDown(kbm.GetKeyForAction(ActionEnums.ENABLE_TILE_COLLISION_ISOTYPE_RENDERING)))
             {
                 TileMapRenderer.TileCollisionDebugging = !TileMapRenderer.TileCollisionDebugging;
             }
 
             //  Open Inventory with Tab.        
-            if (UnityEngine.Input.GetKeyDown(UnityEngine.KeyCode.Tab))
+            if (UnityEngine.Input.GetKeyDown(kbm.GetKeyForAction(ActionEnums.OPEN_INVENTORY)))
             {
                 var players = contexts.agent.GetGroup(AgentMatcher.AllOf(AgentMatcher.AgentPlayer, AgentMatcher.AgentInventory));
                 foreach (var player in players)
@@ -438,7 +445,7 @@ namespace ECSInput
             }
 
             // Change Pulse Weapon Mode.
-            if (UnityEngine.Input.GetKeyDown(UnityEngine.KeyCode.N))
+            if (UnityEngine.Input.GetKeyDown(kbm.GetKeyForAction(ActionEnums.CHANGE_PULSE_WEAPON_MODE)))
             {
                 var PlayerWithToolBarPulse = contexts.agent.GetGroup(AgentMatcher.AllOf(AgentMatcher.AgentPlayer));
                 foreach (var entity in PlayerWithToolBarPulse)
