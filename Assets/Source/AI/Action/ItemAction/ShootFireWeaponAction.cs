@@ -5,6 +5,7 @@ using UnityEngine;
 using Enums;
 using NodeSystem;
 using AI;
+using Particle;
 
 namespace Action
 {
@@ -29,12 +30,12 @@ namespace Action
 
             var physicsState = agentEntity.agentPhysicsState;
 
-            if (physicsState.MovementState != AgentMovementState.Falling &&
+            if (/*physicsState.MovementState != AgentMovementState.Falling &&
             physicsState.MovementState != AgentMovementState.Jump &&
             physicsState.MovementState != AgentMovementState.Flip &&
             physicsState.MovementState != AgentMovementState.JetPackFlying &&
             physicsState.MovementState != AgentMovementState.SlidingLeft &&
-            physicsState.MovementState != AgentMovementState.SlidingRight)
+            physicsState.MovementState != AgentMovementState.SlidingRight*/true)
             {
                 Vec2f target = agentEntity.agentModel3D.AimTarget;
 
@@ -92,6 +93,8 @@ namespace Action
                     float randomSpread = UnityEngine.Random.Range(-spread, spread);
                     ProjectileEntity projectileEntity = planet.AddProjectile(startPos, new Vec2f((target.X - startPos.X) - randomSpread,
                         target.Y - startPos.Y).Normalized, WeaponProperty.ProjectileType, WeaponProperty.BasicDemage, agentEntity.agentID.ID);
+
+                    GameState.Planet.AddParticleEmitter(agentEntity.GetGunFiringPosition(), ParticleEmitterType.MuzzleFlash);
 
                     if (WeaponProperty.ProjectileType == Enums.ProjectileType.Arrow)
                     {

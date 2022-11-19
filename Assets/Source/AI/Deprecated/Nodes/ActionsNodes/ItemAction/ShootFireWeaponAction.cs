@@ -3,6 +3,7 @@ using KMath;
 using UnityEngine;
 using Enums;
 using System.Collections.Generic;
+using Particle;
 
 namespace Node
 {
@@ -43,12 +44,12 @@ namespace Node
 
             var physicsState = agentEntity.agentPhysicsState;
 
-            if (physicsState.MovementState != AgentMovementState.Falling &&
+            if (/*physicsState.MovementState != AgentMovementState.Falling &&
             physicsState.MovementState != AgentMovementState.Jump &&
             physicsState.MovementState != AgentMovementState.Flip &&
             physicsState.MovementState != AgentMovementState.JetPackFlying &&
             physicsState.MovementState != AgentMovementState.SlidingLeft &&
-            physicsState.MovementState != AgentMovementState.SlidingRight)
+            physicsState.MovementState != AgentMovementState.SlidingRight*/true)
             {
                 Vec2f target = Vec2f.Zero;
                 if (agentEntity.isAgentPlayer)
@@ -114,6 +115,8 @@ namespace Node
                     float randomSpread = UnityEngine.Random.Range(-spread, spread);
                     ProjectileEntity projectileEntity = planet.AddProjectile(startPos, new Vec2f((target.X - startPos.X) - randomSpread,
                         target.Y - startPos.Y).Normalized, WeaponProperty.ProjectileType, WeaponProperty.BasicDemage, agentEntity.agentID.ID);
+
+                    GameState.Planet.AddParticleEmitter(agentEntity.GetGunFiringPosition() + new Vec2f(-0.33f, -0.33f), ParticleEmitterType.MuzzleFlash);
 
                     if (WeaponProperty.ProjectileType == ProjectileType.Arrow)
                     {
